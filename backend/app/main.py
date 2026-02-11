@@ -1,13 +1,24 @@
+import sys
+import os
+
+# Add the root directory of the project to the PYTHONPATH
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.insert(0, project_root)
+
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 
-from .core.database import engine, Base
+from backend.app.core.database import engine, Base
+from backend.app.routers import auth
 
 app = FastAPI(title="INHMP API")
 
-# Create tables (only for hackathon - in production use Alembic)
+# Create tables 
 Base.metadata.create_all(bind=engine)
+
+# Include API routers
+app.include_router(auth.router)
 
 # Mount static files (frontend)
 static_path = Path(__file__).parent.parent.parent / "frontend"
