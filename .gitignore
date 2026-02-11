@@ -1,0 +1,17 @@
+################## VS CODE GENERATED FILES ##################
+.vscode/
+tempCodeRunnerFile.*
+
+################## PYTHON GENERATED FILES ##################
+__pycache__/
+*.pyc
+*.pyo
+
+################## VENV GENERATED FILES ##################
+venv/
+env/
+.venv/
+
+################## OS GENERATED FILES ##################
+.DS_Store
+Thumbs.db
