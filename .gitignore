@@ -15,3 +15,15 @@ env/
 ################## OS GENERATED FILES ##################
 .DS_Store
 Thumbs.db
+
+################## MYSQL GENERATE FILES ##################
+*.sql
+*.db
+
+# MySQL configuration files
+my.cnf
+my.ini
+mysql.conf
+
+# MySQL database
+mysql_data/
