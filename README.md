@@ -19,20 +19,21 @@ flowchart TD
     D2[(Patient Records DB)]
 
     Doctor -->|POST /consent/request-otp| P1
-    P1 -->|Generate & Store OTP| D1
-    P1 -->|Send OTP (mock)| Doctor
+    P1 -->|Generate and Store OTP| D1
+    P1 -->|Send OTP| Doctor
 
     Doctor -->|Submit OTP| P2
     P2 -->|Verify OTP| D1
     P2 -->|Create Active Consent| D1
 
-    Doctor -->|GET /patients/{id}/records| P3
+    Doctor -->|GET /patients/:id/records| P3
     P3 -->|Check Active Consent| D1
     P3 -->|Fetch Records| D2
     P3 -->|Return Visit History| Doctor
 ```
 
 ### Emergency Access Override
+
 ```mermaid
 flowchart TD
 
@@ -46,11 +47,11 @@ flowchart TD
     D3[(Patient Records DB)]
 
     Officer -->|POST /emergency/access| P1
-    P1 -->|Log reason, hospital_id,\npatient_id, officer_id| D1
-    P1 -->|Create 5-min Temporary Consent| D2
+    P1 -->|Log reason, hospital_id, patient_id, officer_id| D1
+    P1 -->|Create 5 min Temporary Consent| D2
     P1 -->|Access Granted| Officer
 
-    Officer -->|GET /patients/{id}/records| P2
+    Officer -->|GET /patients/:id/records| P2
     P2 -->|Check Emergency Override| D1
     P2 -->|Validate Temporary Consent| D2
     P2 -->|Fetch Records| D3
