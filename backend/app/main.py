@@ -29,6 +29,7 @@ from app.routers import consent
 from app.routers import emergency
 from app.routers import audit
 from app.routers import analytics  # Import analytics router
+from app.routers import ml  # Import ML router
 
 app = FastAPI(title="INHMP API")
 
@@ -46,6 +47,7 @@ app.include_router(consent.router)
 app.include_router(emergency.router)
 app.include_router(audit.router)
 app.include_router(analytics.router)  # Include analytics router
+app.include_router(ml.router)  # Include ML router
 
 @app.get("/")
 async def read_root():
