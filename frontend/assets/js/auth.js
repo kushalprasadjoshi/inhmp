@@ -1,67 +1,107 @@
-// ============= LOGIN HANDLER =============
-const loginForm = document.getElementById('loginForm');
-if (loginForm) {
-    loginForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-
-        // Clear any previous messages
-        const msgDiv = document.getElementById('loginMessage');
-        if (msgDiv) msgDiv.classList.add('d-none');
-
-        try {
-            const result = await apiFetch('/auth/login', {
-                method: 'POST',
-                body: JSON.stringify({ email, password })
-            });
-
-            console.log('Login success:', result);
-            localStorage.setItem('access_token', result.access_token);
-
-            // Decode token to get role (optional, but recommended for role-based redirect)
-            const token = result.access_token;
-            const payload = JSON.parse(atob(token.split('.')[1]));
-            const role = payload.role;
-            console.log('User role:', role);
-
-            // Show success message
-            if (msgDiv) {
-                msgDiv.className = 'mt-3 alert alert-success';
-                msgDiv.textContent = 'Login successful! Redirecting...';
-                msgDiv.classList.remove('d-none');
+// auth.js – handles registration and login
+document.addEventListener('DOMContentLoaded', () => {
+    // ===== REGISTRATION FORM =====
+    const registerForm = document.getElementById('registerForm');
+    if (registerForm) {
+        loadHospitalsDropdown(); // defined below
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const data = {
+                full_name: form.fullName.value,
+                email: form.email.value,
+                phone: form.phone.value,
+                password: form.password.value,
+                role: form.role.value,
+                hospital_id: form.hospitalId?.value || null
+            };
+            try {
+                await apiFetch('/auth/register', {
+                    method: 'POST',
+                    body: JSON.stringify(data)
+                });
+                showRegisterMessage('Registration successful! Redirecting to login...', 'success');
+                setTimeout(() => window.location.href = '/pages/login.html', 2000);
+            } catch (err) {
+                showRegisterMessage(err.message, 'danger');
             }
+        });
+    }
 
-            // Redirect based on role
-            setTimeout(() => {
-                switch(role) {
-                    case 'Patient':
-                        window.location.href = '/pages/patient_profile.html';
-                        break;
-                    case 'Doctor':
-                        window.location.href = '/pages/visit_entry.html';
-                        break;
-                    case 'HospitalAdmin':
-                        window.location.href = '/pages/hospital_dashboard.html';
-                        break;
-                    case 'EmergencyOfficer':
-                        window.location.href = '/pages/emergency_override.html';
-                        break;
-                    case 'SystemAdmin':
-                        window.location.href = '/pages/audit_logs.html';
-                        break;
-                    default:
-                        window.location.href = '/';
+    // ===== LOGIN FORM =====
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            try {
+                const result = await apiFetch('/auth/login', {
+                    method: 'POST',
+                    body: JSON.stringify({ email, password })
+                });
+                localStorage.setItem('access_token', result.access_token);
+                // Decode token for role-based redirect
+                try {
+                    const payload = JSON.parse(atob(result.access_token.split('.')[1]));
+                    const role = payload.role;
+                    showLoginMessage('Login successful! Redirecting...', 'success');
+                    setTimeout(() => {
+                        const redirects = {
+                            'Patient': '/pages/patient_profile.html',
+                            'Doctor': '/pages/visit_entry.html',
+                            'HospitalAdmin': '/pages/hospital_dashboard.html',
+                            'EmergencyOfficer': '/pages/emergency_override.html',
+                            'SystemAdmin': '/pages/audit_logs.html'
+                        };
+                        window.location.href = redirects[role] || '/';
+                    }, 1500);
+                } catch (e) {
+                    // fallback redirect
+                    window.location.href = '/';
                 }
-            }, 1500);
-
-        } catch (err) {
-            console.error('Login error:', err);
-            if (msgDiv) {
-                msgDiv.className = 'mt-3 alert alert-danger';
-                msgDiv.textContent = err.message || 'Login failed. Please check your credentials.';
-                msgDiv.classList.remove('d-none');
+            } catch (err) {
+                showLoginMessage(err.message, 'danger');
             }
-        }
-    });
+        });
+    }
+});
+
+// ===== HOSPITALS DROPDOWN =====
+async function loadHospitalsDropdown() {
+    const select = document.getElementById('hospitalId');
+    if (!select) return;
+    try {
+        const hospitals = await apiFetch('/hospitals');
+        hospitals.forEach(h => {
+            const option = document.createElement('option');
+            option.value = h.id;
+            option.textContent = h.name;
+            select.appendChild(option);
+        });
+    } catch (err) {
+        console.error('Failed to load hospitals', err);
+    }
+}
+
+// ===== REGISTER MESSAGE =====
+function showRegisterMessage(msg, type) {
+    const msgDiv = document.getElementById('registerMessage');
+    if (msgDiv) {
+        msgDiv.className = `mt-3 alert alert-${type}`;
+        msgDiv.textContent = msg;
+        msgDiv.classList.remove('d-none');
+        setTimeout(() => msgDiv.classList.add('d-none'), 5000);
+    }
+}
+
+// ===== LOGIN MESSAGE =====
+function showLoginMessage(msg, type) {
+    const msgDiv = document.getElementById('loginMessage');
+    if (msgDiv) {
+        msgDiv.className = `mt-3 alert alert-${type}`;
+        msgDiv.textContent = msg;
+        msgDiv.classList.remove('d-none');
+        setTimeout(() => msgDiv.classList.add('d-none'), 5000);
+    }
 }

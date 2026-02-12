@@ -13,7 +13,7 @@ from app.core.database import engine, Base
 from app.core.config import settings
 
 # ✅ 1. FIRST – Import ALL models so SQLAlchemy knows about them
-from app.models import hospital, user  # add patient, visit, etc. later
+from app.models import hospital, user, patient  # add visit, etc. later
 # (You don't need to assign them, just import)
 
 # ✅ 2. THEN – Create tables (this will now see all imported models)
@@ -23,6 +23,7 @@ print("Database tables created successfully (if they didn't exist).")
 
 # ✅ 3. Import routers AFTER tables are created (optional, but safe)
 from app.routers import auth, hospitals
+from app.routers import patients
 
 app = FastAPI(title="INHMP API")
 
@@ -34,6 +35,7 @@ app.mount("/static", StaticFiles(directory=static_path / "assets"), name="assets
 # Include routers
 app.include_router(auth.router)
 app.include_router(hospitals.router)
+app.include_router(patients.router)
 
 @app.get("/")
 async def read_root():

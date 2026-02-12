@@ -20,7 +20,7 @@ class User(Base):
     created_at = Column(TIMESTAMP, server_default=text('CURRENT_TIMESTAMP'))
 
     hospital = relationship("Hospital")
-    # patient = relationship("Patient", back_populates="user", uselist=False)
+    patient = relationship("Patient", back_populates="user", uselist=False)
 
     @property
     def uuid(self):

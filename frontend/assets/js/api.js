@@ -14,8 +14,13 @@ async function apiFetch(endpoint, options = {}) {
         headers
     });
     if (!response.ok) {
-        const error = await response.json().catch(() => ({}));
-        throw new Error(error.detail || 'API request failed');
+        let error;
+        try {
+            error = await response.json();
+        } catch {
+            error = { detail: response.statusText };
+        }
+        throw new Error(error.detail || `HTTP ${response.status}`);
     }
     return response.json();
 }
