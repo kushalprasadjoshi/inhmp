@@ -1,5 +1,4 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import update
 from uuid import UUID
 
 class BaseRepository:
@@ -8,7 +7,8 @@ class BaseRepository:
         self.model = model
 
     def get(self, id: UUID):
-        return self.db.get(self.model, id)
+        # Convert UUID to bytes for lookup
+        return self.db.get(self.model, id.bytes)
 
     def create(self, **kwargs):
         instance = self.model(**kwargs)
