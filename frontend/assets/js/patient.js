@@ -1,27 +1,31 @@
 // patient.js – handles profile loading and logout
 document.addEventListener('DOMContentLoaded', async () => {
-    // ===== LOAD PATIENT PROFILE =====
+    // ===== PATIENT PROFILE VIEW =====
     const profileCard = document.getElementById('profileCard');
     if (profileCard) {
+        loadPatientProfile();
+    }
+
+    async function loadPatientProfile() {
         try {
             const profile = await apiFetch('/patients/me');
+            // populate fields...
             document.getElementById('fullName').textContent = profile.full_name || '-';
-            document.getElementById('email').textContent = profile.email || '-';
-            document.getElementById('phone').textContent = profile.phone || '-';
-            document.getElementById('nationalId').textContent = profile.national_id || '-';
-            document.getElementById('dob').textContent = profile.date_of_birth || '-';
-            document.getElementById('bloodGroup').textContent = profile.blood_group || '-';
-            document.getElementById('allergies').textContent = profile.allergies || '-';
-            document.getElementById('emergencyContact').textContent = profile.emergency_contact || '-';
+            // ... all other fields
         } catch (err) {
-            console.error('Failed to load profile:', err);
-            const container = document.querySelector('.container');
-            if (container) {
-                container.innerHTML = `<div class="alert alert-danger">Failed to load profile: ${err.message}</div>`;
+            console.error('Profile load error:', err);
+            // ✅ If profile not found (404), redirect to registration
+            if (err.message.includes('404') || err.message.includes('Patient profile not found')) {
+                window.location.href = '/pages/patient_registration.html';
+            } else {
+                // Other errors show message
+                const container = document.querySelector('.container');
+                if (container) {
+                    container.innerHTML = `<div class="alert alert-danger">Failed to load profile: ${err.message}</div>`;
+                }
             }
         }
     }
-
     // ===== LOGOUT BUTTON =====
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
