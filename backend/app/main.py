@@ -25,6 +25,7 @@ print("Database tables created successfully (if they didn't exist).")
 from app.routers import auth, hospitals
 from app.routers import patients
 from app.routers import visits  # Import visit router after tables are created
+from app.routers import consent
 
 app = FastAPI(title="INHMP API")
 
@@ -38,6 +39,7 @@ app.include_router(auth.router)
 app.include_router(hospitals.router)
 app.include_router(patients.router)
 app.include_router(visits.router)  # Include visit router
+app.include_router(consent.router)
 
 @app.get("/")
 async def read_root():
