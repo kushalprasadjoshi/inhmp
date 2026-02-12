@@ -21,19 +21,34 @@ def load_models():
 
 def predict_diabetes(features: dict):
     """
-    Expects features: pregnancies, glucose, blood_pressure, skin_thickness,
-                     insulin, bmi, diabetes_pedigree, age
+    Expects PIMA-style features from frontend.
+    Adapts to model that requires: age, bmi, glucose, etc. + extra columns.
     """
     load_models()
-    # Convert to numpy array (order must match training)
-    feature_names = [
-        'pregnancies', 'glucose', 'blood_pressure', 'skin_thickness',
-        'insulin', 'bmi', 'diabetes_pedigree', 'age'
+    
+    # Define the exact columns your model expects (from the error message)
+    required_columns = [
+        'age', 'hypertension', 'heart_disease', 'bmi', 
+        'hba1c_level', 'blood_glucose_level', 'gender', 'smoking_history'
     ]
-    # Ensure correct order
-    input_array = np.array([[features[name] for name in feature_names]])
-    prediction = _diabetes_model.predict(input_array)[0]
-    probability = _diabetes_model.predict_proba(input_array)[0][1]  # positive class
+    
+    # Map incoming features to model columns with sensible defaults
+    row = {
+        'age': features.get('age', 30),
+        'bmi': features.get('bmi', 25),
+        'blood_glucose_level': features.get('glucose', 100),  # map glucose
+        'hypertension': 1 if features.get('blood_pressure', 120) > 140 else 0,
+        'heart_disease': 0,  # default, not provided
+        'hba1c_level': 5.5,  # default
+        'gender': 0,         # default (0 = female)
+        'smoking_history': 0 # default (0 = never)
+    }
+    
+    # Create DataFrame with correct column order
+    input_df = pd.DataFrame([row])[required_columns]
+    
+    prediction = _diabetes_model.predict(input_df)[0]
+    probability = _diabetes_model.predict_proba(input_df)[0][1]
     return {
         "prediction": int(prediction),
         "probability": float(probability),
@@ -46,13 +61,17 @@ def predict_heart(features: dict):
                      thalach, exang, oldpeak, slope, ca, thal
     """
     load_models()
+    
     feature_names = [
         'age', 'sex', 'cp', 'trestbps', 'chol', 'fbs', 'restecg',
         'thalach', 'exang', 'oldpeak', 'slope', 'ca', 'thal'
     ]
-    input_array = np.array([[features[name] for name in feature_names]])
-    prediction = _heart_model.predict(input_array)[0]
-    probability = _heart_model.predict_proba(input_array)[0][1]
+    
+    # Create DataFrame with proper column order
+    input_df = pd.DataFrame([features], columns=feature_names)[feature_names]
+    
+    prediction = _heart_model.predict(input_df)[0]
+    probability = _heart_model.predict_proba(input_df)[0][1]
     return {
         "prediction": int(prediction),
         "probability": float(probability),

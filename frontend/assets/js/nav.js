@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         navContainer.innerHTML = `
             <li class="nav-item"><a class="nav-link" href="/pages/login.html">Login</a></li>
             <li class="nav-item"><a class="nav-link" href="/pages/register.html">Register</a></li>
-            <li class="nav-item"><a class="nav-link" href="/pages/ml_demo.html">AI Demo</a></li>
+            <li class="nav-item"><a class="nav-link" href="/pages/ml_demo.html">Our Models</a></li>
         `;
         return;
     }
