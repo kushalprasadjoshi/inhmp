@@ -24,6 +24,7 @@ print("Database tables created successfully (if they didn't exist).")
 # ✅ 3. Import routers AFTER tables are created (optional, but safe)
 from app.routers import auth, hospitals
 from app.routers import patients
+from app.routers import visits  # Import visit router after tables are created
 
 app = FastAPI(title="INHMP API")
 
@@ -36,6 +37,7 @@ app.mount("/static", StaticFiles(directory=static_path / "assets"), name="assets
 app.include_router(auth.router)
 app.include_router(hospitals.router)
 app.include_router(patients.router)
+app.include_router(visits.router)  # Include visit router
 
 @app.get("/")
 async def read_root():
