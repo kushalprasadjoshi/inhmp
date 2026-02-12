@@ -5,7 +5,7 @@ from backend.app.core.database import get_db
 from backend.app.schemas.auth import UserCreate, UserOut, Token, LoginRequest
 from backend.app.services.auth_service import AuthService
 
-router = APIRouter(prefix="/auth", tags=["Authentication"])
+router = APIRouter(prefix="", tags=["Authentication"])
 
 @router.post("/register", response_model=UserOut)
 def register(user_data: UserCreate, db: Session = Depends(get_db)):
